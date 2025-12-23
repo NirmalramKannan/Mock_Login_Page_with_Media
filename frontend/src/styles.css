@@ -1,0 +1,139 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, sans-serif; }
+
+.page {
+  min-height: 100vh;
+  padding: 0px;
+  background: #121212;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+
+  height: 64px;
+  padding: 0 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: rgb(41, 41, 41);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.headerTitle {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 700;
+  color: #e50914;
+}
+
+.authArea {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.content {
+  padding-top: 24px;
+}
+
+
+.pill {
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 1px solid #d6d9e0;
+  background: white;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.pillPrimary {
+  border: 0;
+  background: #e50914;
+  color: white;
+}
+
+.email {
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.popupCard {
+  position: absolute;
+  top: 44px;
+  right: 0;
+  width: 380px;
+  background: rgb(180, 180, 180);
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  z-index: 10;
+}
+
+.form {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+label { display: grid; gap: 6px; font-size: 14px; color: #222; }
+
+input {
+  padding: 10px 12px;
+  border: 1px solid #d6d9e0;
+  border-radius: 10px;
+  outline: none;
+}
+
+input:focus { border-color: #e50914; }
+
+.btn {
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: #e50914;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+.error {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #ffe8e8;
+  color: #a40000;
+  font-size: 14px;
+}
+
+.muted { margin-top: 12px; color: #535353; font-size: 14px; }
+
+.link {
+  border: 0;
+  background: transparent;
+  color: #e50914;
+  cursor: pointer;
+  padding: 0;
+  font-size: 14px;
+}
+
+.popupHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.closeBtn {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  color: #666;
+}

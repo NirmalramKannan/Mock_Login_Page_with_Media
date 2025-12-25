@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { authApi } from "./api";
+import { authApi, mediaApi } from "./api";
 import "./styles.css";
 
 function AuthPopup({ mode, onSuccess, onSwitchMode, onClose }) {
@@ -87,6 +87,39 @@ export default function App() {
   const [authOpen, setAuthOpen] = useState(false);
   const authAreaRef = useRef(null);
 
+  const [tab, setTab] = useState("media");
+  const [media, setMedia] = useState([]);
+  const [favourites, setFavourites] = useState([]);
+
+  const favIdSet = new Set(favourites.map((x) => x.id));
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const m = await mediaApi.list();
+        setMedia(m.media || []);
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (!user) {
+      setFavourites([]);
+      return;
+    }
+    (async () => {
+      try {
+        const f = await mediaApi.favourites();
+        setFavourites(f.favourites || []);
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  }, [user]);
+
+
   useEffect(() => {
     (async () => {
       try {
@@ -122,6 +155,22 @@ export default function App() {
     setUser(u);
     setAuthOpen(false);
   }
+
+  async function toggleFavourite(mediaId) {
+    if (!user) return; // optionally open login popup here
+    const isFav = favIdSet.has(mediaId);
+
+    // Optimistic update
+    if (isFav) {
+      setFavourites((prev) => prev.filter((x) => x.id !== mediaId));
+      await mediaApi.unfavourite(mediaId);
+    } else {
+      const item = media.find((x) => x.id === mediaId);
+      if (item) setFavourites((prev) => [item, ...prev]);
+      await mediaApi.favourite(mediaId);
+    }
+  }
+
 
   if (loadingMe) return <div className="page">Loading...</div>;
 
@@ -161,6 +210,55 @@ export default function App() {
           )}
         </div>
       </header>
+        <div className="content">
+          <div className="tabs">
+            <button
+              className={`tabBtn ${tab === "media" ? "tabBtnActive" : ""}`}
+              onClick={() => setTab("media")}
+            >
+              Media
+            </button>
+
+            <button
+              className={`tabBtn ${tab === "favourites" ? "tabBtnActive" : ""}`}
+              onClick={() => setTab("favourites")}
+              disabled={!user}
+              title={!user ? "Login to view favourites" : ""}
+            >
+              Favourites {user ? `(${favourites.length})` : ""}
+            </button>
+          </div>
+
+          <div className="grid">
+            {(tab === "media" ? media : favourites).map((item) => (
+              <div className="mediaCard" key={item.id}>
+                <img
+                  className="mediaThumb"
+                  src={`http://localhost:4000${item.file_path}`}
+                  alt={item.title}
+                  loading="lazy"
+                />
+                <div className="mediaRow">
+                  <div className="mediaTitle" title={item.title}>
+                    {item.title}
+                  </div>
+
+                  {user && (
+                    <button className="favBtn" onClick={() => toggleFavourite(item.id)}>
+                      {favIdSet.has(item.id) ? "⭐" : "☆"}
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {tab === "favourites" && user && favourites.length === 0 && (
+            <p className="muted" style={{ marginTop: 14 }}>
+              No favourites yet — go to Media and click ☆ to favourite something.
+            </p>
+          )}
+        </div>
     </div>
   );
 }

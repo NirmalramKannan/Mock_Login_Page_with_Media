@@ -38,7 +38,7 @@ body { margin: 0; font-family: Arial, sans-serif; }
 }
 
 .content {
-  padding-top: 24px;
+  padding: 24px 24px 0 24px;
 }
 
 
@@ -136,4 +136,73 @@ input:focus { border-color: #e50914; }
   font-size: 18px;
   line-height: 1;
   color: #666;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.tabBtn {
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid #d6d9e0;
+  background: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.tabBtnActive {
+  border: 0;
+  background: #e50914;
+  color: white;
+}
+
+.grid {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.mediaCard {
+  background: white;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+.mediaThumb {
+  width: 100%;
+  height: auto; 
+  object-fit: contain;
+  border-radius: 10px;
+  display: block;
+}
+
+.mediaRow {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.mediaTitle {
+  font-size: 14px;
+  color: #222;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.favBtn {
+  border: 1px solid #d6d9e0;
+  background: white;
+  border-radius: 999px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-weight: 700;
 }

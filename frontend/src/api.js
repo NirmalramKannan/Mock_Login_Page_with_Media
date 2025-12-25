@@ -1,5 +1,6 @@
 const API_BASE = "http://localhost:4000";
 
+
 export async function apiFetch(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
     credentials: "include",
@@ -24,6 +25,8 @@ export async function apiFetch(path, options = {}) {
   return data;
 }
 
+
+//authentication api
 export const authApi = {
   register: (email, password) =>
     apiFetch("/api/auth/register", {
@@ -38,3 +41,12 @@ export const authApi = {
   me: () => apiFetch("/api/auth/me"),
   logout: () => apiFetch("/api/auth/logout", { method: "POST" }),
 };
+
+//media api
+export const mediaApi = {
+  list: () => apiFetch("/api/media"),
+  favourites: () => apiFetch("/api/favourites"),
+  favourite: (mediaId) => apiFetch(`/api/favourites/${mediaId}`, { method: "POST" }),
+  unfavourite: (mediaId) => apiFetch(`/api/favourites/${mediaId}`, { method: "DELETE" }),
+};
+

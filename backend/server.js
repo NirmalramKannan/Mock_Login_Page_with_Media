@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const db = require("./db");
 const authMiddleware = require("./authMiddleware");
+const path = require("path");
 
 const app = express();
 
@@ -16,6 +17,16 @@ app.use(
   cors({
     origin: "http://localhost:5173",
     credentials: true,
+  })
+);
+
+app.use(
+  "/media",
+  express.static(path.join(__dirname, "public", "media"), {
+    setHeaders: (res) => {
+      // Cache static assets for 1 day (good for dev; can increase later)
+      res.setHeader("Cache-Control", "public, max-age=86400");
+    },
   })
 );
 
@@ -127,6 +138,81 @@ app.post("/api/auth/logout", (req, res) => {
   });
   res.json({ ok: true });
 });
+
+//get media
+app.get("/api/media", async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      "SELECT id, title, file_path, media_type FROM media ORDER BY id DESC"
+    );
+    res.json({ media: rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error." });
+  }
+});
+
+//get favourites
+app.get("/api/favourites", authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const [rows] = await db.query(
+      `
+      SELECT m.id, m.title, m.file_path, m.media_type
+      FROM favourites f
+      JOIN media m ON m.id = f.media_id
+      WHERE f.user_id = ?
+      ORDER BY f.created_at DESC
+      `,
+      [userId]
+    );
+
+    res.json({ favourites: rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error." });
+  }
+});
+
+//set favourite
+app.post("/api/favourites/:mediaId", authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const mediaId = Number(req.params.mediaId);
+    if (!Number.isFinite(mediaId)) return res.status(400).json({ message: "Invalid media id." });
+
+    await db.query(
+      "INSERT IGNORE INTO favourites (user_id, media_id) VALUES (?, ?)",
+      [userId, mediaId]
+    );
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error." });
+  }
+});
+
+//remove favourite
+app.delete("/api/favourites/:mediaId", authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const mediaId = Number(req.params.mediaId);
+    if (!Number.isFinite(mediaId)) return res.status(400).json({ message: "Invalid media id." });
+
+    await db.query(
+      "DELETE FROM favourites WHERE user_id = ? AND media_id = ?",
+      [userId, mediaId]
+    );
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error." });
+  }
+});
+
 
 const port = process.env.PORT || 4000;
 app.listen(port, () => console.log(`API running: http://localhost:${port}`));
